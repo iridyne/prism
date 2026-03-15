@@ -1,0 +1,33 @@
+# Data Sources Configuration
+
+data_sources:
+  # Fund data sources
+  funds:
+    - name: eastmoney
+      base_url: "http://fund.eastmoney.com"
+      rate_limit: 100  # requests per minute
+    - name: danjuanfund
+      base_url: "https://danjuanfund.com"
+      rate_limit: 60
+
+  # Market data
+  markets:
+    - name: akshare
+      enabled: true
+    - name: yahoo_finance
+      enabled: true
+
+  # News sources
+  news:
+    - name: eastmoney_news
+      base_url: "http://finance.eastmoney.com"
+    - name: openbb
+      enabled: true
+
+  # Sentiment sources
+  sentiment:
+    - name: xueqiu
+      base_url: "https://xueqiu.com"
+      rate_limit: 30
+    - name: dazihui
+      enabled: false  # TODO: implement

@@ -1,0 +1,36 @@
+# Agent Configuration
+
+coordinator:
+  model: claude-opus-4-6
+  temperature: 0.3
+  max_iterations: 5
+
+agents:
+  fundamental_analyst:
+    model: claude-sonnet-4-6
+    temperature: 0.2
+    system_prompt: "You are a fundamental analyst specializing in Chinese mutual funds."
+
+  technical_analyst:
+    model: claude-sonnet-4-6
+    temperature: 0.2
+    system_prompt: "You are a technical analyst focusing on market trends and indicators."
+
+  risk_analyst:
+    model: claude-sonnet-4-6
+    temperature: 0.1
+    system_prompt: "You are a risk analyst evaluating portfolio risk metrics."
+
+  sentiment_analyst:
+    model: claude-sonnet-4-6
+    temperature: 0.3
+    system_prompt: "You analyze retail investor sentiment from social platforms."
+
+  macro_analyst:
+    model: claude-sonnet-4-6
+    temperature: 0.2
+    system_prompt: "You analyze macroeconomic trends and sector rotation."
+
+debate:
+  max_rounds: 3
+  consensus_threshold: 0.7

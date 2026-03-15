@@ -1,0 +1,35 @@
+# Monitoring Configuration
+
+event_detection:
+  # News sentiment thresholds
+  news_sentiment:
+    spike_threshold: 2.5  # standard deviations
+    window_minutes: 30
+
+  # Price movement thresholds
+  price_movement:
+    abnormal_change_pct: 5.0  # percentage
+    volume_spike_multiplier: 3.0
+
+  # Black swan indicators
+  black_swan:
+    vix_threshold: 30
+    correlation_breakdown: 0.3
+
+# Scheduling
+schedule:
+  periodic_analysis:
+    - cron: "0 9 * * 1-5"  # Weekdays 9 AM
+      type: daily_review
+    - cron: "0 16 * * 5"   # Friday 4 PM
+      type: weekly_summary
+
+# Alerts
+alerts:
+  channels:
+    - type: log
+      enabled: true
+    - type: email
+      enabled: false
+    - type: wechat
+      enabled: false
