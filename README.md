@@ -48,6 +48,16 @@ It is designed for research and decision support, not for real-time trading.
 ## Local Setup
 
 ```bash
+# One-command start (backend + frontend)
+./start.sh
+
+# Fast start without reinstalling dependencies
+./start.sh --skip-install
+ 
+# Override ports/host
+PRISM_BACKEND_PORT=8001 PRISM_FRONTEND_PORT=5174 ./start.sh
+
+# Or run services separately:
 # Install backend dependencies
 uv sync
 

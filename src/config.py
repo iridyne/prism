@@ -14,8 +14,11 @@ class Settings(BaseSettings):
         default_factory=lambda: [
             "http://localhost:5173",
             "http://localhost:3000",
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:3000",
         ]
     )
+    cors_origin_regex: str = r"^https?://(localhost|127\\.0\\.0\\.1)(:\\d+)?$"
 
     # Database (default sqlite for local MVP)
     database_url: str = "sqlite+aiosqlite:///./prism.db"
