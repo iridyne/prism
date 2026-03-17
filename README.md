@@ -57,6 +57,13 @@ It is designed for research and decision support, not for real-time trading.
 # Override ports/host
 PRISM_BACKEND_PORT=8001 PRISM_FRONTEND_PORT=5174 ./start.sh
 
+# Stop backend/frontend services
+./stop.sh
+
+# Smoke test the backend flow:
+# health -> create portfolio -> analyze -> poll task -> get analysis
+./smoke.sh
+
 # Or run services separately:
 # Install backend dependencies
 uv sync
