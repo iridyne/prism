@@ -1,6 +1,9 @@
+import asyncio
 from typing import Any
-from langgraph.graph import StateGraph, END
+
+from langgraph.graph import END, StateGraph
 from loguru import logger
+
 from .base_agent import BaseAgent
 from .communication.message_bus import AgentState
 
@@ -19,11 +22,9 @@ class Coordinator:
 
         async def run_agents(state: AgentState) -> AgentState:
             """Run all agents in parallel"""
-            results = []
-            for agent in self.agents.values():
-                result = await agent.analyze(state["input_data"])
-                results.append(result)
-
+            results = await asyncio.gather(
+                *[agent.analyze(state["input_data"]) for agent in self.agents.values()]
+            )
             state["agent_results"] = results
             return state
 
@@ -31,7 +32,6 @@ class Coordinator:
             """Aggregate agent results into final recommendation"""
             results = state["agent_results"]
 
-            # Simple aggregation: average confidence, combine analyses
             avg_confidence = sum(r["confidence"] for r in results) / len(results)
             combined_analysis = "\n\n".join([
                 f"**{r['agent']}** (confidence: {r['confidence']:.2f}):\n{r['analysis']}"

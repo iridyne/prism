@@ -1,6 +1,8 @@
 from typing import Any
-from .base_agent import BaseAgent
+
 from loguru import logger
+
+from .base_agent import BaseAgent
 
 
 class FundamentalAnalyst(BaseAgent):

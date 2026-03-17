@@ -1,39 +1,65 @@
-import redis.asyncio as redis
+from __future__ import annotations
+
+import asyncio
+from datetime import datetime, timedelta
 from typing import Any
-import json
+
 from loguru import logger
-from src.config import settings
 
 
 class CacheManager:
-    """Redis-based cache manager"""
+    """Process-local TTL cache used by fetchers in MVP."""
 
-    def __init__(self):
-        self.redis: redis.Redis | None = None
+    _instance: "CacheManager | None" = None
+    _cache: dict[str, tuple[Any, datetime]] = {}
+    _lock: asyncio.Lock | None = None
 
-    async def connect(self):
-        """Connect to Redis"""
-        self.redis = await redis.from_url(settings.redis_url)
-        logger.info("Connected to Redis")
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    async def connect(self) -> None:
+        # Reserved for future external cache backend (redis/memcached).
+        return
+
+    async def close(self) -> None:
+        # Reserved for future external cache backend cleanup.
+        return
+
+    async def _get_lock(self) -> asyncio.Lock:
+        if self._lock is None:
+            self._lock = asyncio.Lock()
+        return self._lock
 
     async def get(self, key: str) -> Any | None:
-        """Get value from cache"""
-        if not self.redis:
+        lock = await self._get_lock()
+        async with lock:
+            if key not in self._cache:
+                return None
+
+            value, expiry = self._cache[key]
+            if datetime.now() < expiry:
+                logger.debug(f"Cache hit: {key}")
+                return value
+
+            del self._cache[key]
+            logger.debug(f"Cache expired: {key}")
             return None
 
-        value = await self.redis.get(key)
-        if value:
-            return json.loads(value)
-        return None
+    async def set(self, key: str, value: Any, ttl: int = 300) -> None:
+        lock = await self._get_lock()
+        async with lock:
+            expiry = datetime.now() + timedelta(seconds=ttl)
+            self._cache[key] = (value, expiry)
+            logger.debug(f"Cache set: {key} (TTL: {ttl}s)")
 
-    async def set(self, key: str, value: Any, ttl: int = 300):
-        """Set value in cache with TTL (seconds)"""
-        if not self.redis:
-            return
-
-        await self.redis.setex(key, ttl, json.dumps(value))
-
-    async def close(self):
-        """Close Redis connection"""
-        if self.redis:
-            await self.redis.aclose()
+    async def clear_expired(self) -> None:
+        lock = await self._get_lock()
+        async with lock:
+            now = datetime.now()
+            expired = [k for k, (_, exp) in self._cache.items() if now >= exp]
+            for key in expired:
+                del self._cache[key]
+            if expired:
+                logger.debug(f"Cleared {len(expired)} expired cache entries")

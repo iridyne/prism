@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Any
+
 from langchain_anthropic import ChatAnthropic
 from loguru import logger
+
 from src.config import settings
 
 
